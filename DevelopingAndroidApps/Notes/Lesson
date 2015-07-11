@@ -1,0 +1,91 @@
+Lesson 1 - Create Project Sunshine:
+
+*-Android has some fundemental differences.
+
+Android is like a computer from the 90s.
+
+*-Key Mobile Challenges:
+    -Low Processing Power
+    -Limited RAM
+    -Intermitent, Low Bandwidth, High Latency data connections.
+    -Impact on Battery Life.
+
+*-Largest proportion of phones. about 60% are Jelly Bean.
+    -Min SDK -> Low pass filter. Lowest supported SDK
+    -Target SDK -> The platform you have tested on.
+    
+*-New app target should be the latest release. Since we want to be able to test on new API
+    -Make sure the gradle build:
+        -compileSDKVersion is the latest target api
+        - targetSDKVersion is also the latest target API
+
+*-Creating a new AVD
+    -See lecture slides.
+
+*-Android as a full Software Stack
+
+-Application Layer
+-Application Framework
+-C/C++ Libs Android Runtime
+-Linux - Power Management etc
+
+
+*-Build Process
+
+*-Android Project:
+
+Gradle   Gradle     Jar Signer ADB (Android Debug Bridge)
+
+Build -> Byte Code -> Sign -> Install
+         Resources            on device
+         Manifest
+            -APK
+
+The usage of these commands is entirely optional. The result is that same as clicking the Run button in Android Studio.
+
+chmod +x gradlew - This command only needs to be run once and is used to give gradlew the correct execute permissions.
+./gradlew assembleDebug - This command will compile the code.
+
+adb install -r app/build/outputs/apk/app-debug-unaligned.apk - This command will install the APK.
+With the -r flag it will overwrite any prior installed versions. Note if you have more than one device,
+you will need to use the -s flag right after adb to specify the serial number of the intended device.
+adb shell am start -n com.example.android.sunshine.app/com.example.android.sunshine.app.MainActivity - This command will actually run the app.
+
+
+Android UI:
+Text Fields (Edit Texts): - Applies appropriate entry mode to  soft keyboard.
+Image View - Applies things to image in src.
+List View
+
+
+Responsive Design:
+*- Fram Layout
+*- Linear layout
+*- Relative Layout
+*- Grid Layout
+
+Design everything to a common element then set breakpoints for alternate desings.
+- Small phone,
+- Medium Phone,
+- Large phone,
+- Tablet.
+
+*- Use the simplest layout that gets the job done.
+
+-FrameLayout is great if you have one child view that fills the entire content area.
+
+-Linear Layout is perfect for stacking views veritcally or horizontally. Only way to design views proporitonally.
+
+-Relative Layout is a more sophisticated layout that allows the positioning of views relative to other views
+or boundaries of the view.
+
+
+eg.
+*- ScrollView
+    *- Linear Layout
+
+- Challenge: See lecture.
+
+-List View: See notes.
+
+
