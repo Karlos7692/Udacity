@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">My App Portfolio</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -9,4 +9,9 @@
     <string name="btn_build_it_bigger">BUILD IT BIGGER</string>
     <string name="btn_xyz_reader">XYZ READER</string>
     <string name="btn_capstone_my_app">CAPSTONE: MY OWN APP</string>
+    <string name="btn_capstone_message">capstone app</string>
+    <string name="textview_main_title">My Nanodegree Apps!</string>
+    <string name="launch_message_start">This button will launch my&#160;</string>
+    <string name="launch_message_end">!</string>
+
 </resources>

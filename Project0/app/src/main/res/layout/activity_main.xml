@@ -9,19 +9,34 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/textview_main_title"
+        android:id="@+id/textview_main_title"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/abc_button_padding_vertical_material"
+        android:layout_marginBottom="@dimen/abc_text_size_title_material"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_spotify_streamer"
             android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:text="@string/btn_spotify_streamer" />
+            android:text="@string/btn_spotify_streamer"
+            android:background="@color/practice_orange"/>
 
     </LinearLayout>
 
@@ -29,14 +44,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_scores_app"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:text="@string/btn_scores_app" />
+            android:text="@string/btn_scores_app"
+            android:padding="@dimen/abc_button_padding_vertical_material"
+            android:background="@color/practice_orange"/>
 
     </LinearLayout>
 
@@ -44,16 +64,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_library_app"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_scores_app"
-            android:layout_centerHorizontal="true"
-            android:text="@string/btn_library_app" />
+            android:text="@string/btn_library_app"
+            android:padding="@dimen/abc_button_padding_vertical_material"
+            android:background="@color/practice_orange"/>
 
     </LinearLayout>
 
@@ -61,16 +84,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_build_it_bigger"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_library_app"
-            android:layout_centerHorizontal="true"
-            android:text="@string/btn_build_it_bigger" />
+            android:text="@string/btn_build_it_bigger"
+            android:padding="@dimen/abc_button_padding_vertical_material"
+            android:background="@color/practice_orange"/>
 
     </LinearLayout>
 
@@ -79,17 +105,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_xyz_reader"
             style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_build_it_bigger"
-            android:layout_centerHorizontal="true"
-            android:text="@string/btn_xyz_reader" />
+            android:text="@string/btn_xyz_reader"
+            android:padding="@dimen/abc_button_padding_vertical_material"
+            android:background="@color/practice_orange"/>
 
     </LinearLayout>
 
@@ -97,16 +126,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="4"
-        android:gravity="center">
+        android:weightSum="5"
+        android:gravity="center"
+        android:paddingTop="@dimen/abc_button_padding_vertical_material"
+        android:paddingBottom="@dimen/abc_button_padding_vertical_material">
 
         <Button
             android:id="@+id/btn_capstone_my_app"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_xyz_reader"
-            android:layout_centerHorizontal="true"
-            android:text="@string/btn_capstone_my_app" />
+            android:text="@string/btn_capstone_my_app"
+            android:padding="@dimen/abc_button_padding_vertical_material"
+            android:background="@color/capstone_red"
+            android:textColor="@color/capstone_text_color"/>
 
     </LinearLayout>
 
