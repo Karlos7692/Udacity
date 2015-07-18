@@ -5,6 +5,7 @@ package app.sunshine.karlnelson.udacity.com.sunshine.app;
  */
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -30,15 +30,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
 
+    private static final String LOG_TAG = "FORECAST FRAGMENT:";
     private ArrayAdapter<String> mAdapter;
 
     public ForecastFragment() {
@@ -56,26 +54,12 @@ public class ForecastFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        String[] forecastsArray = {
-                "Today - Sunny - 88/63",
-                "Tomorrow - Foggy - 75/46",
-                "Mon - Cloudy - 70/46",
-                "Tue - Asteroids - 72/63",
-                "Wed - Heavy Rain - 64/51",
-                "Thu - HELP TRAPPED IN WEATHER STATION - 70/46",
-                "Fri - Sunny - 80/68",
-        };
-
-        List<String> weeksForecast = new ArrayList<>(Arrays.asList(forecastsArray));
-
-        mAdapter = new ArrayAdapter<String>(
+        mAdapter = new ArrayAdapter<>(
                 getActivity(),
                 //Layout  of the list
                 R.layout.list_item_forcast,
                 //How the view is rendered
-                R.id.list_item_forecast_textview,
-                //The data
-                weeksForecast);
+                R.id.list_item_forecast_textview);
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mAdapter);
@@ -100,27 +84,31 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        
         if ( id == R.id.action_refresh ) {
-
-            final String location = PreferenceManager
-                    .getDefaultSharedPreferences(getActivity())
-                    .getString(getString(R.string.pref_location_key),
-                            getString(R.string.pref_location_default_value));
-            
-            item.setOnMenuItemClickListener( new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    WeatherFetcherTask fetcherTask = new WeatherFetcherTask();
-
-
-                    fetcherTask.execute(location);
-
-                    Toast.makeText(getActivity(), "Refresh the weather =) ", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            });
+            updateWeather();
+            return true;
         }
+            
         return false;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    public void updateWeather() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        String location = preferences.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default_value));
+        String units = preferences.getString(getString(R.string.pref_temperature_units_key),
+                getString(R.string.pref_temperature_units_metric));
+
+        WeatherFetcherTask fetcherTask = new WeatherFetcherTask();
+        fetcherTask.execute(location, units);
     }
 
     public class WeatherFetcherTask extends AsyncTask<String,Void,String[]> {
@@ -132,12 +120,11 @@ public class ForecastFragment extends Fragment {
         public static final String DAYS_PARAM = "cnt";
         private String LOG_TAG = WeatherFetcherTask.class.getSimpleName();
 
-
-
         @Override
         protected String[] doInBackground(String... params) {
 
             String postcode = params[0];
+            String units = params[1];
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -148,12 +135,10 @@ public class ForecastFragment extends Fragment {
             String forecastJsonStr = null;
 
             try {
-
-
                 Uri weatherResource= Uri.parse(FORECAST_BASE_URL).buildUpon()
                         .appendQueryParameter(QUERY_PARAM, postcode)
                         .appendQueryParameter(FORMAT_PARAM, "json")
-                        .appendQueryParameter(UNITS_PARAM, "metric")
+                        .appendQueryParameter(UNITS_PARAM, units)
                         .appendQueryParameter(DAYS_PARAM, "7")
                         .build();
 

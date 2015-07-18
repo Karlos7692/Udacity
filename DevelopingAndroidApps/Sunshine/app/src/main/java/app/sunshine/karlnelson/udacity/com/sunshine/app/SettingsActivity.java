@@ -1,12 +1,15 @@
 package app.sunshine.karlnelson.udacity.com.sunshine.app;
 
+import android.app.ActionBar;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -22,11 +25,13 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Add 'general' preferences, defined in the XML file
         addPreferencesFromResource(R.xml.pref_general);
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_temperature_units_key)));
     }
 
     /**
@@ -49,7 +54,6 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         String stringValue = value.toString();
-
         if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list (since they have separate labels/values).
