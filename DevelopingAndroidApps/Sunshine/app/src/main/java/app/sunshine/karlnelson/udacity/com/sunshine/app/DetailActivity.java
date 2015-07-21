@@ -1,16 +1,19 @@
 package app.sunshine.karlnelson.udacity.com.sunshine.app;
 
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.TextView;
 
 
@@ -56,19 +59,54 @@ public class DetailActivity extends ActionBarActivity {
 
     public static class DetailFragment extends Fragment {
 
-        private String mWeatherDetail;
+        private static final String HASH_TAG = "#Sunshine";
+        private static final String LOG_TAG = "DETAIL FRAGMENT";
+
+        private String mWeather;
+        private ShareActionProvider mShareActionProvider;
 
         public DetailFragment() {
+            setHasOptionsMenu(true);
+        }
 
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.detailfragment, menu);
+
+            MenuItem item = menu.findItem(R.id.action_share);
+
+            mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+
+            if ( mShareActionProvider != null ) {
+                mShareActionProvider.setShareIntent(createForecastIntent());
+            } else {
+                Log.d(LOG_TAG, "Unable to find a action provider to share intent");
+            }
+        }
+
+        private Intent createForecastIntent() {
+            Intent share = new Intent(Intent.ACTION_SEND);
+            //Prevents the activity from placing your activity on the stack,
+            //When you hit the ba
+            share.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            share.setType("text/plain");
+            share.putExtra(Intent.EXTRA_TEXT, mWeather + " " + HASH_TAG);
+            return share;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-            String detail = getActivity().getIntent().getStringExtra(DETAIL_FIELD);
+            mWeather = getActivity().getIntent().getStringExtra(DETAIL_FIELD);
             TextView detailTextView = (TextView) rootView.findViewById(R.id.weather_detail);
-            detailTextView.setText(detail);
+            detailTextView.setText(mWeather);
             return rootView;
         }
     }
