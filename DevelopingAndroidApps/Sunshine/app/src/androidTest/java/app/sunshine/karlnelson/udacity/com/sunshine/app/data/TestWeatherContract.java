@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package app.com.example.android.sunshine.app.data;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.data;
 
 import android.net.Uri;
 import android.test.AndroidTestCase;
-
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
 
 /*
     Students: This is NOT a complete test for the WeatherContract --- just for the functions

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package app.com.example.android.sunshine.app.data;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.data;
 
 import android.content.ComponentName;
 import android.content.ContentUris;
@@ -26,11 +26,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
 
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
 import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract.WeatherEntry;
 import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract.LocationEntry;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherDbHelper;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherProvider;
 
 /*
     Note: This is not a complete set of tests of the Sunshine ContentProvider, but it does test

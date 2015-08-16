@@ -1,4 +1,4 @@
-package app.com.example.android.sunshine.app.data;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.data;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,9 +9,8 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.test.AndroidTestCase;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
-import app.com.example.android.sunshine.app.utils.PollingCheck;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherDbHelper;
+
+import app.sunshine.karlnelson.udacity.com.sunshine.app.utils.PollingCheck;
 
 import java.util.Map;
 import java.util.Set;

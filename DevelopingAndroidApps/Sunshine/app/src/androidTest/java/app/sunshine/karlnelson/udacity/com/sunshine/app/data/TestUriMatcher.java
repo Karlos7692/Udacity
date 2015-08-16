@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package app.com.example.android.sunshine.app.data;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.data;
 
 import android.content.UriMatcher;
 import android.net.Uri;
 import android.test.AndroidTestCase;
-
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherProvider;
 
 /*
     Uncomment this class when you are ready to test your UriMatcher.  Note that this class utilizes

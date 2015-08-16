@@ -15,7 +15,7 @@
  *
  * Note: This file copied from the Android CTS Tests
  */
-package app.com.example.android.sunshine.app.utils;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.utils;
 
 import junit.framework.Assert;
 

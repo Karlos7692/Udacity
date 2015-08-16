@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package app.com.example.android.sunshine.app.data;
+package app.sunshine.karlnelson.udacity.com.sunshine.app.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import java.util.HashSet;
-
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
-import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherDbHelper;
 
 public class TestDb extends AndroidTestCase {
 
