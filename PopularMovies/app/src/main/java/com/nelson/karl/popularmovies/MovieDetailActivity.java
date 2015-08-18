@@ -1,32 +1,32 @@
 package com.nelson.karl.popularmovies;
 
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
-public class MainDiscoveryActivity extends AppCompatActivity {
+import com.nelson.karl.popularmovies.data.model.Movie;
+
+public class MovieDetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_discovery);
+        setContentView(R.layout.activity_movie_detail);
 
         if ( savedInstanceState == null ) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.container, new MainDiscoveryFragment(), MainDiscoveryFragment.TAG)
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.movie_detail_fragment_container, new MovieDetailFragment())
                     .commit();
         }
 
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main_discovery, menu);
+        getMenuInflater().inflate(R.menu.menu_movie_detail, menu);
         return true;
     }
 
@@ -37,8 +37,8 @@ public class MainDiscoveryActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

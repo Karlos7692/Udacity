@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:title="@string/pref_discover_movies_title"
+        android:key="@string/pref_discover_movies_key"
+        android:entries="@array/discover_settings"
+        android:entryValues="@array/discover_setting_values"
+        android:defaultValue="@string/discover_popular_movies"
+        android:summary="%s"
+        />
+</PreferenceScreen>
