@@ -8,6 +8,7 @@
         android:id="@+id/discovery_fragment_move_grid"
         android:horizontalSpacing="0dp"
         android:verticalSpacing="0dp"
+        android:columnWidth="90dp"
         android:numColumns="auto_fit"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

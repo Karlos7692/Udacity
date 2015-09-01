@@ -42,6 +42,12 @@ public class MovieDetailActivity extends AppCompatActivity {
             return true;
         }
 
+        //Do not recreate the main activity.
+        if ( id == R.id.home ) {
+            onBackPressed();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 }

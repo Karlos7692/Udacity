@@ -110,7 +110,7 @@ public class Movie implements Parcelable {
         mPosterPath = in.readString();
         mSynopsis = in.readString();
         mUserRating = in.readDouble();
-        mReleaseDate = new Date( in.readLong() );
+        mReleaseDate = (Date) in.readValue(ClassLoader.getSystemClassLoader());
     }
 
     @Override
@@ -124,7 +124,7 @@ public class Movie implements Parcelable {
         dest.writeString(mTitle);
         dest.writeString(mPosterPath);
         dest.writeString(mSynopsis);
-        dest.writeDouble( mUserRating );
-        dest.writeLong( mReleaseDate.getTime() );
+        dest.writeDouble(mUserRating);
+        dest.writeValue( mReleaseDate );
     }
 }
