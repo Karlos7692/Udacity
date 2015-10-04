@@ -29,24 +29,36 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements DetailFragment.Callback {
 
 
     private static final String LOG_TAG = "MAIN ACTIVITY:";
     private String mLocation;
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         mLocation = Utility.getPreferredLocation(this);
 
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment(), ForecastFragment.TAG)
-                    .commit();
+        if ( findViewById(R.id.weather_detail_container) != null ) {
+            mTwoPane = true;
+
+            if ( savedInstanceState == null ) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailFragment(), DetailFragment.TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
+
+        ForecastFragment ff = (ForecastFragment)
+                getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+
+        ff.useLargeTodayView(!mTwoPane);
 
         Log.d(LOG_TAG, "onCreate");
     }
@@ -60,12 +72,25 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ForecastFragment frag = (ForecastFragment) getSupportFragmentManager()
+
+        String location = Utility.getPreferredLocation(this);
+
+        ForecastFragment ff = (ForecastFragment) getSupportFragmentManager()
                 .findFragmentByTag(ForecastFragment.TAG);
 
-        frag.onLocationChanged();
+        if ( ff != null && !location.equals(mLocation) ) {
+            ff.onLocationChanged();
+        }
 
-        mLocation = Utility.getPreferredLocation(this);
+        DetailFragment df = (DetailFragment) getSupportFragmentManager()
+                .findFragmentByTag(DetailFragment.TAG);
+
+        if ( df != null ) {
+            df.onLocationChanged(location);
+        }
+
+        mLocation = location;
+
     }
 
     private void viewLocation() {
@@ -113,5 +138,23 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemSelected(Uri uri) {
+        if ( mTwoPane ) {
+            Bundle args = new Bundle();
+            args.putParcelable(DetailFragment.DETAIL_URI, uri);
+            DetailFragment df = new DetailFragment();
+            df.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.weather_detail_container, df, DetailFragment.TAG)
+                    .commit();
+
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class).setData(uri);
+            startActivity(intent);
+        }
     }
 }

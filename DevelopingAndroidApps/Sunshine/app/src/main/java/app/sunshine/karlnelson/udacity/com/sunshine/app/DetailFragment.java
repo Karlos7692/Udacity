@@ -1,7 +1,9 @@
 package app.sunshine.karlnelson.udacity.com.sunshine.app;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -29,7 +31,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static final String HASH_TAG = "#Sunshine";
     private static final String LOG_TAG = "DETAIL FRAGMENT";
+    public static final String TAG = "DETAIL FRAGMENT";
+    public static final String DETAIL_URI = "DETAIL URI";
+
     public static final int DETAIL_FRAGMENT_LOADER = 1;
+
+    public interface Callback {
+        public void onItemSelected(Uri uri);
+    }
 
     private static final String[] DETAIL_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -60,6 +69,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public static final int COL_WEATHER_DEGREES = 8;
     public static final int COL_WEATHER_CONDITION_ID = 9;
 
+
     private ImageView mIconView;
     private TextView mFriendlyDateView;
     private TextView mDateView;
@@ -71,6 +81,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mPressureView;
 
     private String mWeather;
+    private Uri mUri;
     private ShareActionProvider mShareActionProvider;
 
     public DetailFragment() {
@@ -91,6 +102,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         getLoaderManager().initLoader(DETAIL_FRAGMENT_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
+
+    private void restoreArguments() {
+        Bundle savedArguments = getArguments();
+        if ( savedArguments != null ) {
+            mUri = savedArguments.getParcelable(DETAIL_URI);
+        }
+    }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -120,6 +140,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        restoreArguments();
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
         mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
@@ -135,14 +156,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
+        if (mUri==null) {
             return null;
         }
 
         return new CursorLoader(
                 getActivity(),
-                intent.getData(),
+                mUri,
                 DETAIL_COLUMNS,
                 null,
                 null,
@@ -155,8 +175,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             // Read weather condition ID from cursor
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
-            // Use placeholder Image
-            mIconView.setImageResource(R.mipmap.ic_launcher);
+
+            mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
             // Read date from cursor and update views for day of week and date
             long date = data.getLong(COL_WEATHER_DATE);
@@ -168,6 +188,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // Read description from cursor and update view
             String description = data.getString(COL_WEATHER_DESC);
             mDescriptionView.setText(description);
+
+            mIconView.setContentDescription(description);
 
             // Read high temperature from cursor and update view
             boolean isMetric = Utility.isMetric(getActivity());
@@ -207,6 +229,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+    public void onLocationChanged( String newLocation ) {
+        Uri uri = mUri;
+        if ( uri != null ) {
+            long date = WeatherEntry.getDateFromUri(uri);
+            Uri updated = WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updated;
+            getLoaderManager().restartLoader(DETAIL_FRAGMENT_LOADER,null,this);
+        }
+
     }
 }
 

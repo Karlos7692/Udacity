@@ -36,9 +36,17 @@ public class ForecastAdapter extends CursorAdapter {
             lowView = (TextView) view.findViewById(R.id.list_item_low_textview);
         }
     }
+
+    private boolean mUseTodayView = false;
+
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
+
+    public void setUseTodayView(boolean useTodayView) {
+        mUseTodayView = useTodayView;
+    }
+
     /**
      * Prepare the weather high/lows for presentation.
      */
@@ -86,7 +94,7 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
+        return position == 0 && mUseTodayView ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE_DAY;
     }
 
     @Override
@@ -104,10 +112,11 @@ public class ForecastAdapter extends CursorAdapter {
         ViewHolder holder = (ViewHolder) view.getTag();
 
         // Read weather icon ID from cursor
-        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
-        // Use placeholder image for now
-        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-        iconView.setImageResource(R.mipmap.ic_launcher);
+        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
+
+        int resourceId = getItemViewType(cursor.getPosition()) == VIEW_TYPE_TODAY ?
+                Utility.getArtResourceForWeatherCondition(weatherId) :
+                Utility.getIconResourceForWeatherCondition(weatherId);
 
         // Read date from cursor
         long dateInMillis = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
@@ -118,6 +127,9 @@ public class ForecastAdapter extends CursorAdapter {
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
         // Find TextView and set weather forecast on it
         holder.descriptionView.setText(description);
+
+        holder.iconView.setImageResource(resourceId);
+        holder.iconView.setContentDescription(description);
 
         // Read user preference for metric or imperial temperature units
         boolean isMetric = Utility.isMetric(context);

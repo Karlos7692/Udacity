@@ -7,7 +7,6 @@ package app.sunshine.karlnelson.udacity.com.sunshine.app;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -21,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
@@ -64,12 +62,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final String LOG_TAG = "FORECAST FRAGMENT:";
 
     public static final String TAG = "FORECAST FRAGMENT";
+    public static final String IS_TODAY_VIEW_LARGE = "TVL";
 
     private static final int FORECAST_LOADER_ID = 0;
+    private static final String SELECTION_KEY = "selection position";
 
     private ForecastAdapter mAdapter;
+    private ListView mListView;
+    private int mPosition = 0;
+    private boolean mLargeTodayView;
 
     public ForecastFragment() {
+    }
+
+    public void useLargeTodayView( boolean isTwoPane ) {
+        mLargeTodayView = isTwoPane;
+        if ( mAdapter != null ) {
+            mAdapter.setUseTodayView(mLargeTodayView);
+        }
     }
 
     @Override
@@ -86,31 +96,46 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mAdapter = new ForecastAdapter(getActivity(), null, 0);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        mAdapter.setUseTodayView(mLargeTodayView);
 
-        listView.setAdapter(mAdapter);
+        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setAdapter(mAdapter);
+
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(i);
                 if (cursor != null) {
+                    DetailFragment.Callback callback = (DetailFragment.Callback) getActivity();
                     String locationSetting = Utility.getPreferredLocation(getActivity());
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
-                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
-                            ));
-                    startActivity(intent);
+                    callback.onItemSelected(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                            locationSetting, cursor.getLong(COL_WEATHER_DATE)));
+
                 }
+                mPosition = i;
             }
         });
+
+        if ( savedInstanceState != null && savedInstanceState.containsKey(SELECTION_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTION_KEY);
+        }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if ( mPosition != ListView.INVALID_POSITION ) {
+            outState.putInt(SELECTION_KEY, mPosition);
+            outState.putBoolean(IS_TODAY_VIEW_LARGE, mLargeTodayView);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -167,6 +192,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        mListView.setSelection(mPosition);
     }
 
     @Override
