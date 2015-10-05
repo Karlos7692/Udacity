@@ -1,18 +1,19 @@
 package com.nelson.karl.popularmovies.data.model;
 
-import android.graphics.drawable.Drawable;
-import android.media.Image;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 
-import java.io.Serializable;
+import com.nelson.karl.popularmovies.data.model.provider.MovieContract;
+
 import java.util.Date;
 
 /**
  * Created by Karl on 17/08/2015.
  */
-public class Movie implements Parcelable {
+public class Movie implements ORM, Parcelable {
+
 
     public static final double INVALID_RATING = -1;
 
@@ -25,8 +26,31 @@ public class Movie implements Parcelable {
     private double mUserRating;
     private Date mReleaseDate;
 
+    private double mPopularity;
+    private double mVoteAvg;
+
     public Movie() {
     }
+
+    @Override
+    public Movie get(Cursor cursor) {
+
+        if ( cursor == null || cursor.isClosed() || cursor.isBeforeFirst()
+                || cursor.isAfterLast() ) {
+            return null;
+        }
+
+        Movie movie = new Movie();
+        movie.setId( cursor.getLong(MovieContract.MovieEntry.COL_ID) );
+        movie.setTitle(cursor.getString(MovieContract.MovieEntry.COL_TITLE));
+        movie.setPosterPath(cursor.getString(MovieContract.MovieEntry.COL_POSTER_PATH));
+        movie.setUserRating(cursor.getDouble(MovieContract.MovieEntry.COL_USER_RATING));
+        movie.setReleaseDate(new Date(cursor.getLong(MovieContract.MovieEntry.COL_RELEASE_DATE)));
+
+        cursor.moveToNext();
+        return movie;
+    }
+
 
     public long getId() {
         return mId;

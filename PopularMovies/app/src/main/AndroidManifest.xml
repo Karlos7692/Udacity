@@ -36,6 +36,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nelson.karl.popularmovies.MainDiscoveryActivity" />
         </activity>
+
+        <provider
+            android:authorities="com.nelson.karl.popularmovies"
+            android:name=".data.model.provider.MovieProvider"
+            android:exported="false"/>
+
     </application>
 
 </manifest>

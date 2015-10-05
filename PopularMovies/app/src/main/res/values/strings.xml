@@ -10,4 +10,5 @@
     <string name="pref_discover_movies_title">Discover Movies by:</string>
     <string name="discover_popular_movies">popularity</string>
     <string name="discover_highest_rated_movies">vote_average</string>
+    <string name="main_discovery_fragment_tag">main discovery fragment</string>
 </resources>

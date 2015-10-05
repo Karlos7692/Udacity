@@ -23,15 +23,25 @@ public class MovieDetailFragment extends Fragment {
 
     public static final String MOVIE_DETAILS = "movie details";
 
+    //TODO move to stings
     public static final String USER_RATING_FORMAT = "%.1f/10 rating.";
 
     private static final String DATE_FORMAT_STR = "dd/mm/yyyy";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STR);
+    public static final String TAG = "MOVIE DETAIL FRAGMENT";
 
     private Movie mMovie;
 
+    public interface MovieChangedCallback {
+        public void onMovieSelected( Movie movie );
+    }
+
     public MovieDetailFragment() {
         // Required empty public constructor
+    }
+
+    public void onMovieChanged(Movie movie) {
+        mMovie = movie;
     }
 
     @Override
@@ -59,23 +69,24 @@ public class MovieDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        if ( mMovie != null ) {
+            TextView banner = (TextView) root.findViewById(R.id.movie_detail_banner);
+            banner.setText(mMovie.getTitle());
 
-        TextView banner = (TextView) root.findViewById(R.id.movie_detail_banner);
-        banner.setText(mMovie.getTitle());
+            ImageView poster = (ImageView) root.findViewById(R.id.movie_detail_poster);
+            Uri imageUri = APIUtil.getImage(mMovie.getPosterPath());
+            //Picasso caches previously loaded images.
+            Picasso.with(getActivity()).load(imageUri.toString()).into(poster);
 
-        ImageView poster = (ImageView) root.findViewById(R.id.movie_detail_poster);
-        Uri imageUri = APIUtil.getImage( mMovie.getPosterPath() );
-        //Picasso caches previously loaded images.
-        Picasso.with(getActivity()).load(imageUri.toString()).into(poster);
+            TextView releaseTextView = (TextView) root.findViewById(R.id.movie_detail_release_date);
+            releaseTextView.setText(formatReleaseDate());
 
-        TextView releaseTextView = (TextView) root.findViewById(R.id.movie_detail_release_date);
-        releaseTextView.setText(formatReleaseDate());
+            TextView userRatingView = (TextView) root.findViewById(R.id.movie_detail_user_rating);
+            userRatingView.setText(formatUserRating());
 
-        TextView userRatingView = (TextView) root.findViewById(R.id.movie_detail_user_rating);
-        userRatingView.setText( formatUserRating() );
-
-        TextView synopsisTextView = (TextView) root.findViewById(R.id.movie_detail_synopsis);
-        synopsisTextView.setText( mMovie.getSynopsis() );
+            TextView synopsisTextView = (TextView) root.findViewById(R.id.movie_detail_synopsis);
+            synopsisTextView.setText(mMovie.getSynopsis());
+        }
         return root;
     }
 

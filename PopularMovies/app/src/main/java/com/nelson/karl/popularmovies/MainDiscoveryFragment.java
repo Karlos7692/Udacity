@@ -34,8 +34,13 @@ public class MainDiscoveryFragment extends Fragment {
             + " connection. Please connect to the internet.";
 
     private MovieAdapter mDataAdapter;
+    private boolean mTwoPane;
 
     public MainDiscoveryFragment() {
+    }
+
+    public void setIsTwoPane( boolean largeDevice ) {
+        mTwoPane = largeDevice;
     }
 
     @Override
@@ -69,9 +74,14 @@ public class MainDiscoveryFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = (Movie) parent.getItemAtPosition(position);
-                Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                intent.putExtra(MovieDetailFragment.MOVIE_DETAILS, movie);
-                startActivity(intent);
+                if ( mTwoPane ) {
+                    MainDiscoveryActivity mdf = (MainDiscoveryActivity) getActivity();
+                    mdf.onMovieSelected(movie);
+                } else {
+                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+                    intent.putExtra(MovieDetailFragment.MOVIE_DETAILS, movie);
+                    startActivity(intent);
+                }
             }
         });
 
@@ -84,7 +94,7 @@ public class MainDiscoveryFragment extends Fragment {
         if ( savedInstanceState==null ) {
             updateMovies();
         } else {
-            restoreMovieDate( savedInstanceState );
+            restoreMovieDate(savedInstanceState);
         }
     }
 

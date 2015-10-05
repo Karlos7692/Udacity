@@ -6,19 +6,32 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainDiscoveryActivity extends AppCompatActivity {
+import com.nelson.karl.popularmovies.data.model.Movie;
+
+public class MainDiscoveryActivity extends AppCompatActivity implements
+        MovieDetailFragment.MovieChangedCallback {
+
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_discovery);
 
-        if ( savedInstanceState == null ) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.container, new MainDiscoveryFragment(), MainDiscoveryFragment.TAG)
+        if ( findViewById(R.id.movie_detail_fragment_container) != null ) {
+            mTwoPane = true;
+
+            MovieDetailFragment mdf = new MovieDetailFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.movie_detail_fragment_container, mdf, mdf.TAG)
                     .commit();
+        } else {
+            mTwoPane = false;
         }
+
+        MainDiscoveryFragment mainDiscFrag = (MainDiscoveryFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.main_discovery_fragment);
+        mainDiscFrag.setIsTwoPane(mTwoPane);
 
     }
 
@@ -43,5 +56,13 @@ public class MainDiscoveryActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onMovieSelected(Movie movie) {
+        MovieDetailFragment mdf = (MovieDetailFragment) getSupportFragmentManager()
+                .findFragmentByTag(MovieDetailFragment.TAG);
+
+        mdf.onMovieChanged(movie);
     }
 }

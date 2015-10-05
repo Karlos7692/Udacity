@@ -1,12 +1,11 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_discovery_fragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:tag="@string/main_discovery_fragment_tag"
+    android:name="com.nelson.karl.popularmovies.MainDiscoveryFragment"
+    tools:context="com.nelson.karl.popularmovies.MainDiscoveryFragment"
+    tools:layout="@layout/fragment_main_discovery">
 
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
-
-    </FrameLayout>
-
-</FrameLayout>
+</fragment>
