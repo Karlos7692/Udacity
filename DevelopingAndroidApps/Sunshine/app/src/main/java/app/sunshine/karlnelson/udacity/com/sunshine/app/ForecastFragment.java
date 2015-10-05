@@ -4,6 +4,10 @@ package app.sunshine.karlnelson.udacity.com.sunshine.app;
  * Created by Karl on 21/04/15.
  */
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -23,6 +27,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
+import app.sunshine.karlnelson.udacity.com.sunshine.app.service.SunshineService;
+import app.sunshine.karlnelson.udacity.com.sunshine.app.sync.SunshineSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -160,16 +166,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
     }
 
-    public void updateWeather() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        String location = preferences.getString(getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default_value));
-        String units = preferences.getString(getString(R.string.pref_temperature_units_key),
-                getString(R.string.pref_temperature_units_metric));
-
-        FetchWeatherTask fetcherTask = new FetchWeatherTask(getActivity());
-        fetcherTask.execute(location, units);
+    private void updateWeather() {
+        SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
     @Override
