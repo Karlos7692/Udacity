@@ -40,7 +40,6 @@ public class MainActivity extends ActionBarActivity implements DetailFragment.Ca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mLocation = Utility.getPreferredLocation(this);
 
         if ( findViewById(R.id.weather_detail_container) != null ) {
             mTwoPane = true;
@@ -93,25 +92,6 @@ public class MainActivity extends ActionBarActivity implements DetailFragment.Ca
 
     }
 
-    private void viewLocation() {
-        String location = PreferenceManager.getDefaultSharedPreferences(this)
-                .getString(getString(R.string.pref_location_key),
-                        getString(R.string.pref_location_default_value));
-
-        Uri mapURI = Uri.parse("geo:0:0?").buildUpon()
-                .appendQueryParameter("q", location)
-                .build();
-
-        Intent viewLocation = new Intent(Intent.ACTION_VIEW, mapURI);
-
-        //See if the intent can be resolved
-        if ( viewLocation.resolveActivity(getPackageManager()) != null ) {
-            startActivity(viewLocation);
-        } else {
-            Log.d(LOG_TAG, "Could not resolve " + location + "no maps app installed!");
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -129,11 +109,6 @@ public class MainActivity extends ActionBarActivity implements DetailFragment.Ca
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-
-        if ( id == R.id.action_view_location ) {
-            viewLocation();
             return true;
         }
 

@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -152,9 +153,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        
-        if ( id == R.id.action_refresh ) {
-            updateWeather();
+//
+//        if ( id == R.id.action_refresh ) {
+//            updateWeather();
+//            return true;
+//        }
+
+        if ( id == R.id.action_view_location ) {
+            viewLocation();
             return true;
         }
             
@@ -166,10 +172,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().restartLoader(FORECAST_LOADER_ID, null, this);
     }
 
+    private void viewLocation() {
+       if ( mAdapter != null ) {
+           Cursor cursor = mAdapter.getCursor();
+           if ( cursor != null ) {
+               cursor.moveToFirst();
+               String lat = cursor.getString(COL_COORD_LAT);
+               String lng = cursor.getString(COL_COORD_LONG);
+               Uri geoLocation = Uri.parse("geo: "+ lat +"," + lng);
+
+               Intent viewLocation = new Intent(Intent.ACTION_VIEW, geoLocation);
+
+               //See if the intent can be resolved
+               if ( viewLocation.resolveActivity(getActivity().getPackageManager()) != null ) {
+                   startActivity(viewLocation);
+               } else {
+                   Log.d(LOG_TAG, "Could not resolve " + geoLocation  + "no maps app installed!");
+               }
+           }
+       }
+    }
+
     private void updateWeather() {
-//        Intent intent = new Intent(getActivity(), SunshineService.class)
-//                .putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utility.getPreferredLocation(getActivity()));
-//        getActivity().startService(intent);
         SunshineSyncAdapter.syncImmediately(getActivity());
     }
 
