@@ -1,13 +1,10 @@
-package com.nelson.karl.popularmovies.data.utils;
+package com.nelson.karl.popularmovies.data.web.strategies;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.util.Log;
 
-import com.nelson.karl.popularmovies.MovieAdapter;
-import com.nelson.karl.popularmovies.data.model.Movie;
-import com.nelson.karl.popularmovies.data.parsers.MovieJsonParser;
+import com.nelson.karl.popularmovies.data.parsers.JsonParser;
 
 import org.json.JSONException;
 
@@ -17,47 +14,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
-/**
- * Created by Karl on 16/08/2015.
- */
-public class MovieDownloadTask extends AsyncTask<String, Void, List<Movie>>{
+public abstract class DownloadStrategy<Params, Result> {
 
-    private static final String LOG_TAG = "Movie Download Task";
+    public final String LOG_TAG = "Download Strategy: ";
 
     private Context mContext;
-    private MovieAdapter mDataAdapter;
+    private JsonParser<Result> mParser;
 
-    public MovieDownloadTask( Context context, MovieAdapter dataAdapter ) {
+    public DownloadStrategy( Context context, JsonParser<Result> parser) {
         mContext = context;
-        mDataAdapter = dataAdapter;
+        mParser = parser;
     }
 
-    @Override
-    protected List<Movie> doInBackground( String... params ) {
-        return getData( params );
-    }
-
-    @Override
-    protected void onPostExecute( List<Movie> movies ) {
-        if ( movies != null && mDataAdapter != null ) {
-            mDataAdapter.clear();
-            for ( Movie movie : movies ) {
-                mDataAdapter.add( movie );
-            }
-        }
-    }
-
-    private List<Movie> getData( String... params ) {
-
-        // Verify that we need to download something.
-//        if (params.length == 0) {
-//            return null;
-//        }
+    public Result apply(Params... params) {
 
         //Parse the list of movies from JSON;
-        List<Movie> movies = null;
+        Result result = null;
 
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
@@ -69,10 +42,10 @@ public class MovieDownloadTask extends AsyncTask<String, Void, List<Movie>>{
             // Possible parameters are avaiable at OWM's forecast API page, at
             // http://openweathermap.org/API#forecas
 
-            Uri discoverMovies = APIUtil.discoverMovies( mContext );
-            URL url = new URL( discoverMovies.toString() );
+            Uri uri = getDownloadUri(params);
+            URL url = new URL(uri.toString());
 
-            Log.d(LOG_TAG, "dm: " + discoverMovies.toString() );
+            Log.d(LOG_TAG, uri.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -103,10 +76,12 @@ public class MovieDownloadTask extends AsyncTask<String, Void, List<Movie>>{
             }
             Log.d(LOG_TAG, "buffer: " + buffer.toString());
             try {
-                movies = MovieJsonParser.parseMovies( buffer.toString() );
-                return movies;
+                // Parse result
+                result = mParser.parse(buffer.toString());
+                doAdditionalStrategies(result);
+                return result;
             } catch (JSONException e) {
-                Log.d( LOG_TAG, "Could not parse Json to movies" );
+                Log.d(LOG_TAG, "Could not parse Json.");
             }
 
         } catch (IOException e) {
@@ -127,5 +102,19 @@ public class MovieDownloadTask extends AsyncTask<String, Void, List<Movie>>{
 
         //Only happens if there was an error.
         return null;
+    }
+
+    public void doAdditionalStrategies(Result result) {
+        // Do nothing, let children override these functions if need be!
+    }
+
+    public void insertResultIntoDB (Result result ) {
+        // Do nothing, let children override these functions if need be!
+    }
+
+    public abstract Uri getDownloadUri(Params... params);
+
+    public Context getContext() {
+        return mContext;
     }
 }

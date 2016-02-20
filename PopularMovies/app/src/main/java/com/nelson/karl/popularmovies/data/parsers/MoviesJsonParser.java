@@ -1,8 +1,10 @@
 package com.nelson.karl.popularmovies.data.parsers;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.nelson.karl.popularmovies.data.model.Movie;
+import com.nelson.karl.popularmovies.data.model.orm.ObjectModelList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,7 +12,6 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -18,7 +19,7 @@ import java.util.Locale;
 /**
  * Created by Karl on 17/08/2015.
  */
-public class MovieJsonParser {
+public class MoviesJsonParser implements JsonParser<List<Movie>> {
 
     public static final String LOG_TAG = "Movie Json Parser";
 
@@ -34,12 +35,11 @@ public class MovieJsonParser {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STR,
             Locale.getDefault());
 
-
-
-    public static List<Movie> parseMovies( String result ) throws JSONException {
+    @Override
+    public List<Movie> parse(String result) throws JSONException {
         JSONObject jsonObject = new JSONObject( result );
 
-        List<Movie> movies = new ArrayList<>();
+        List<Movie> movies = new ObjectModelList<>(Uri.parse(""));
 
         JSONArray resultsArray = jsonObject.getJSONArray( MOVIES_RESULT_ARRAY );
         for ( int i=0; i<resultsArray.length(); i++ ) {

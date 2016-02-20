@@ -1,4 +1,4 @@
-package com.nelson.karl.popularmovies.data.utils;
+package com.nelson.karl.popularmovies.data.web;
 
 
 import android.content.Context;
@@ -25,7 +25,8 @@ public class APIUtil {
 
     private static final String MOVIE_PATH = "movie";
     private static final String VIDEOS_PATH = "videos";
-    private static final String DISCOVER_MOVIES_PATH = "/discover/movie";
+    private static final String DISCOVER_MOVIES_PATH = "discover/movie";
+    private static final String REVIEWS_PATH = "reviews";
 
     private static final String YOUTUBE_WATCH_PATH = "watch";
     private static final String YOUTUBE_VIDEO_KEY="v";
@@ -40,6 +41,7 @@ public class APIUtil {
     public static final Uri MOVIES_THUMB_BASE_URI = Uri.parse(MOVIES_THUMB_BASE_URL);
     private static final Uri YOUTUBE_BASE_URI = Uri.parse(YOUTUBE_BASE_URL);
 
+
     public static Uri discoverMovies( Context context ) {
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences( context );
@@ -50,7 +52,7 @@ public class APIUtil {
         );
 
             return MOVIES_BASE_URI.buildUpon()
-                    .appendPath(DISCOVER_MOVIES_PATH)
+                    .appendEncodedPath(DISCOVER_MOVIES_PATH)
                     .appendQueryParameter(SORT_BY, sortBy+DESC)
                     .appendQueryParameter(API_KEY_QUERY, API_KEY).build();
 
@@ -58,9 +60,9 @@ public class APIUtil {
 
     public static Uri getTrailers( long movieID ) {
         return MOVIES_BASE_URI.buildUpon()
-                .appendPath(MOVIE_PATH)
-                .appendPath(Long.toString(movieID))
-                .appendPath(VIDEOS_PATH)
+                .appendEncodedPath(MOVIE_PATH)
+                .appendEncodedPath(Long.toString(movieID))
+                .appendEncodedPath(VIDEOS_PATH)
                 .appendQueryParameter(API_KEY_QUERY, API_KEY).build();
     }
 
@@ -73,9 +75,23 @@ public class APIUtil {
 
     public static Uri getTrailer( String trailerYoutubeValue ) {
         return YOUTUBE_BASE_URI.buildUpon()
-                .appendPath(YOUTUBE_WATCH_PATH)
+                .appendEncodedPath(YOUTUBE_WATCH_PATH)
                 .appendQueryParameter(YOUTUBE_VIDEO_KEY, trailerYoutubeValue)
                 .build();
     }
 
+    public static Uri getMovieDetails(long id) {
+        return MOVIES_BASE_URI.buildUpon()
+                .appendEncodedPath(MOVIE_PATH)
+                .appendEncodedPath(Long.toString(id))
+                .appendQueryParameter(API_KEY_QUERY, API_KEY).build();
+    }
+
+    public static Uri getMovieReviews(long id) {
+        return MOVIES_BASE_URI.buildUpon()
+                .appendEncodedPath(MOVIE_PATH)
+                .appendEncodedPath(Long.toString(id))
+                .appendEncodedPath(REVIEWS_PATH)
+                .appendQueryParameter(API_KEY_QUERY, API_KEY).build();
+    }
 }
