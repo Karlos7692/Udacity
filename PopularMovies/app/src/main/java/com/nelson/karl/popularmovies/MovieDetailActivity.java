@@ -43,7 +43,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
 
         //Do not recreate the main activity.
-        if ( id == R.id.home ) {
+        if ( id == android.R.id.home ) {
             onBackPressed();
             return true;
         }

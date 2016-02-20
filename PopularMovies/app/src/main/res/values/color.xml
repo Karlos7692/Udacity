@@ -2,4 +2,6 @@
 <resources>
     <color name="backdrop_color">#282828</color>
     <color name="banner_color">#009688</color>
+    <color name="light_teal">#86e4db</color>
+    <color name="favourite_on">#edef75</color>
 </resources>

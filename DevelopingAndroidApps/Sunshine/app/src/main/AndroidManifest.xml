@@ -46,10 +46,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.sunshine.karlnelson.udacity.com.sunshine.app.MainActivity"/>
         </activity>
-        
+
         <provider
-            android:authorities="com.example.android.sunshine.app"
-            android:name=".data.WeatherProvider" />
+            android:authorities="@string/content_authority"
+            android:name=".data.WeatherProvider"
+            android:exported="false"
+            android:syncable="true" />
 
         <service android:name=".service.SunshineService"/>
 
@@ -65,11 +67,6 @@
                 android:resource="@xml/authenticator" />
         </service>
 
-        <provider
-            android:authorities="@string/content_authority"
-            android:name=".data.WeatherProvider"
-            android:exported="false"
-            android:syncable="true" />
         <!-- The SyncAdapter service -->
         <service
             android:name=".sync.SunshineSyncService"

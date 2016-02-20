@@ -1,10 +1,8 @@
 package com.nelson.karl.popularmovies.data.parsers;
 
-import android.net.Uri;
 import android.util.Log;
 
 import com.nelson.karl.popularmovies.data.model.Movie;
-import com.nelson.karl.popularmovies.data.model.orm.ObjectModelList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,6 +10,8 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -19,7 +19,7 @@ import java.util.Locale;
 /**
  * Created by Karl on 17/08/2015.
  */
-public class MoviesJsonParser implements JsonParser<List<Movie>> {
+public class MoviesJsonParser implements JsonParser<Collection<Movie>> {
 
     public static final String LOG_TAG = "Movie Json Parser";
 
@@ -39,7 +39,7 @@ public class MoviesJsonParser implements JsonParser<List<Movie>> {
     public List<Movie> parse(String result) throws JSONException {
         JSONObject jsonObject = new JSONObject( result );
 
-        List<Movie> movies = new ObjectModelList<>(Uri.parse(""));
+        List<Movie> movies = new ArrayList<>();
 
         JSONArray resultsArray = jsonObject.getJSONArray( MOVIES_RESULT_ARRAY );
         for ( int i=0; i<resultsArray.length(); i++ ) {
@@ -61,7 +61,7 @@ public class MoviesJsonParser implements JsonParser<List<Movie>> {
         Movie movie = new Movie();
 
         //Required attributes
-        movie.setId( parseID( jsonMovie) );
+        movie.setId( parseId(jsonMovie) );
         movie.setTitle( parseTitle( jsonMovie ) );
         movie.setPosterPath(parsePosterPath(jsonMovie));
 
@@ -73,7 +73,7 @@ public class MoviesJsonParser implements JsonParser<List<Movie>> {
     }
 
     /* Movie requires an id */
-    private static long parseID( JSONObject jsonMovie ) throws JSONException {
+    private static long parseId(JSONObject jsonMovie) throws JSONException {
         return jsonMovie.getLong( MOVIE_ID );
     }
 

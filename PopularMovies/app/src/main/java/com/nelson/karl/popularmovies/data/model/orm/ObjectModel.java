@@ -1,5 +1,6 @@
 package com.nelson.karl.popularmovies.data.model.orm;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by Karl on 4/01/2016.
  * Implementation of the ORM.
  */
-public abstract class ObjectModel implements ORM {
+public abstract class ObjectModel<T extends ObjectModel> implements ORM {
 
     private static final String SELECTION_FORMAT = "%s = ? ";
 
@@ -31,15 +32,19 @@ public abstract class ObjectModel implements ORM {
     }
 
     public void update( Context context ) {
-        context.getContentResolver().update(this.getUri(), this.toContentValues(),
-                getSelection(), getDBIdentifierValues() );
+        context.getContentResolver().update(this.getUri(),
+                this.toContentValues(), getSelection(), getDBIdentifierValues());
         List<ORM> orms = getHasRelations();
         if ( orms != null ) {
             for (ORM orm : orms ) {
                 orm.update(context);
+
             }
         }
     }
+
+    public abstract void merge( Context context, T model );
+
     public abstract ContentValues toContentValues();
 
     public abstract Uri getUri();
@@ -48,9 +53,9 @@ public abstract class ObjectModel implements ORM {
 
     public abstract String[] getDBIdentifierValues();
 
-    //TODO add better delete methods.
     public void delete( Context context ) {
-        context.getContentResolver().delete(getUri(), getSelection(), getDBIdentifierValues());
+        context.getContentResolver().delete(getUri(), getSelection(),
+                getDBIdentifierValues());
     }
 
     public String getSelection() {

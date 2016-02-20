@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">Popular Movies</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -11,4 +11,11 @@
     <string name="discover_popular_movies">popularity</string>
     <string name="discover_highest_rated_movies">vote_average</string>
     <string name="main_discovery_fragment_tag">main discovery fragment</string>
+    <string name="friendly_release_date_format">yyyy</string>
+    <string name="friendly_trailer_text_format">Trailer <xliff:g id="number">%d</xliff:g></string>
+    <string name="friendly_user_rating_format"> <xliff:g id="rating">%.1f</xliff:g>/10 rating.</string>
+    <string name="friendly_movie_duration"> <xliff:g id="rating">%d</xliff:g>mins</string>
+    <string name="friendly_author_text">Author: <xliff:g id="rating">%s</xliff:g></string>
+    <string name="mark_as_favourite">MARK AS FAVOURITE</string>
+
 </resources>

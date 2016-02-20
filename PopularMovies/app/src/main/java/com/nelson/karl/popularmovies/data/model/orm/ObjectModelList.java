@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Karl on 13/01/2016.
@@ -14,13 +16,6 @@ import java.util.ArrayList;
 public class ObjectModelList<T extends ObjectModel> extends ArrayList<T> implements ORM {
 
     private Uri mQueryUri;
-
-    // Force user to give bulk insert uri.
-    // We also want a simplistic insert for any "has" relationship
-    // TODO refactor if passing uri as parameter is cleaner.
-    private ObjectModelList() {
-
-    }
 
     public ObjectModelList( Uri queryUri ) {
         mQueryUri = queryUri;
@@ -41,6 +36,9 @@ public class ObjectModelList<T extends ObjectModel> extends ArrayList<T> impleme
 
     @Override
     public void insert(Context context) {
+        // Cannot insert into db without a query uri.
+        if ( mQueryUri == null ) { return; }
+
         ContentValues[] values = new ContentValues[this.size()];
         for ( int i=0; i < this.size(); i++ ) {
             values[i] = this.get(i).toContentValues();
@@ -49,6 +47,9 @@ public class ObjectModelList<T extends ObjectModel> extends ArrayList<T> impleme
     }
 
     public void update(Context context) {
+        // Cannot update db without query uri.
+        if ( mQueryUri == null ) { return; }
+
         for ( int i=0; i < this.size(); i++ ) {
             T model = this.get(i);
             context.getContentResolver().update(model.getUri(), model.toContentValues(),
@@ -63,13 +64,79 @@ public class ObjectModelList<T extends ObjectModel> extends ArrayList<T> impleme
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
     public Uri getUri() {
         return mQueryUri;
     }
 
+    public void setUri( Uri queryUri ) {
+        mQueryUri = queryUri;
+    }
+
+    /**
+     * Assume that the db identifiers are correct, we should only get a set of objects matching
+     * the db identifiers. We thus recursively merge each structure according to the external list.
+     * Note: No functionality for ObjectModelList<Movie> since the bulk insert is not defined in the
+     * content provider.
+     * @param externalModels
+     */
+    public void merge(Context context, ObjectModelList<T> externalModels) {
+
+        ObjectModelList<T> modelsToInsert = getMissingModels(externalModels);
+        modelsToInsert.insert(context);
+
+        //TODO finish delete code
+        ObjectModelList<T> modelsToRemove = getAdditionalModels(externalModels);
+        modelsToRemove.delete(context);
+
+        ObjectModelList<T> similarModels = getSimilarInternalModels(externalModels);
+        this.clear();
+
+        // Maintain order of external list. Cannot assume order hence O(n^2) merge.
+        for (T externalModel : externalModels) {
+            if (similarModels.contains(externalModel)) {
+
+                T model = getObjectModel(externalModel, similarModels);
+                if (model == null) {
+                    continue;
+                }
+                model.merge(context, externalModel);
+                this.add(model);
+
+            } else if (modelsToInsert.contains(externalModel)) {
+                this.add(externalModel);
+            }
+        }
+    }
+
+    private T getObjectModel(ObjectModel model, ObjectModelList<T> list) {
+        for ( T item : list ) {
+            if ( model.equals(item) ) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public ObjectModelList<T> getMissingModels(ObjectModelList<T> external) {
+        Set<T> differentExternalModels = new HashSet<>(external);
+        differentExternalModels.removeAll(this);
+        ObjectModelList<T> missingModels = new ObjectModelList<>(external.getUri());
+        missingModels.addAll(differentExternalModels);
+        return missingModels;
+    }
+
+    public ObjectModelList<T> getAdditionalModels(ObjectModelList<T> external) {
+        Set<T> differentInternalModels = new HashSet<>(this);
+        differentInternalModels.removeAll(external);
+        ObjectModelList<T> additionalModels = new ObjectModelList<>(this.getUri());
+        additionalModels.addAll(differentInternalModels);
+        return additionalModels;
+    }
+
+    private ObjectModelList<T> getSimilarInternalModels(ObjectModelList<T> external) {
+        ObjectModelList<T> similarModels = new ObjectModelList<>(this.getUri());
+        similarModels.addAll(this);
+        similarModels.retainAll(external);
+        return similarModels;
+    }
 }

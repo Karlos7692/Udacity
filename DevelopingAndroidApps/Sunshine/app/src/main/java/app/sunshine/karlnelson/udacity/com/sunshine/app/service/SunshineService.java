@@ -28,6 +28,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import app.sunshine.karlnelson.udacity.com.sunshine.app.R;
 import app.sunshine.karlnelson.udacity.com.sunshine.app.data.WeatherContract;
 
 import org.json.JSONArray;
@@ -44,6 +45,7 @@ import java.util.Vector;
 
 
 public class SunshineService extends IntentService {
+    private static final String APPID = "APPID";
     private ArrayAdapter<String> mForecastAdapter;
     public static final String LOCATION_QUERY_EXTRA = "lqe";
     private final String LOG_TAG = SunshineService.class.getSimpleName();
@@ -83,6 +85,7 @@ public class SunshineService extends IntentService {
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                    .appendQueryParameter(APPID, getString(R.string.open_weather_api_key))
                     .build();
 
             URL url = new URL(builtUri.toString());

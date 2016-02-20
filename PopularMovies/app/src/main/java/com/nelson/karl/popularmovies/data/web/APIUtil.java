@@ -16,7 +16,7 @@ public class APIUtil {
     //API Keys
     private static final String API_KEY_QUERY = "api_key";
     //TODO Insert API key here.
-    private static final String API_KEY = "da0d214971cf7d332409622116e8aac1";
+    private static final String API_KEY = "";
 
     //Base Urls
     private static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3";

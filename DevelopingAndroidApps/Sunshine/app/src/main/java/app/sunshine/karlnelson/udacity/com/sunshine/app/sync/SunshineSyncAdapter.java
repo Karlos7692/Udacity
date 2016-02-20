@@ -1,3 +1,5 @@
+package app.sunshine.karlnelson.udacity.com.sunshine.app.sync;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.NotificationManager;
@@ -43,6 +45,7 @@ import java.net.URL;
 import java.util.Vector;
 
 public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+    private static final String APPID = "APPID";
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
@@ -102,6 +105,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
                     .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                    .appendQueryParameter(APPID, getContext().getString(R.string.open_weather_api_key))
                     .build();
 
             URL url = new URL(builtUri.toString());

@@ -14,7 +14,6 @@
             android:layout_height="125dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="Movie"
             android:gravity="center_vertical"
             android:textColor="@color/abc_primary_text_material_dark"
             android:background="@color/material_deep_teal_500"
@@ -45,8 +44,7 @@
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_weight="2"
-                android:layout_height="match_parent"
-                android:weightSum="4">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/movie_detail_release_date"
@@ -56,9 +54,19 @@
                     android:layout_weight="1"
                     android:paddingTop="2dp"
                     android:paddingLeft="2dp"
-                    android:text="2015-07-05"
-                    android:textSize="@dimen/abc_text_size_large_material"
+                    android:textAppearance="?android:textAppearanceLarge"
                     android:textColor="#757575"/>
+                
+                <TextView
+                    android:id="@+id/movie_detail_duration"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:paddingTop="2dp"
+                    android:paddingLeft="2dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textColor="@color/material_blue_grey_800"
+                    android:textStyle="bold|italic"/>
 
                 <TextView
                     android:id="@+id/movie_detail_user_rating"
@@ -66,10 +74,22 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:textStyle="bold|italic"
-                    android:textColor="#616161"
-                    android:paddingLeft="2dp"
+                    android:textColor="@color/material_blue_grey_900"
+                    android:paddingLeft="2dp" />
 
-                    android:text="8.3/10"/>
+                <Button
+                    android:id="@+id/movie_detail_favourite_button"
+                    android:layout_width="120dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bordered_teal_rectangle"
+                    android:text="@string/mark_as_favourite"
+                    android:padding="4dp"
+                    android:textColor="@color/material_blue_grey_800"/>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"/>
+
             </LinearLayout>
 
         </LinearLayout>
@@ -78,7 +98,9 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
+                android:id="@+id/movie_detail_overview_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
@@ -87,17 +109,18 @@
                 android:text="@string/movie_overview_title"
                 android:textStyle="bold"
                 android:textColor="#424242"/>
+
             <TextView
                 android:id="@+id/movie_detail_synopsis"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Lorem ipsum something or rather"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"/>
 
         </LinearLayout>
 
         <View
+            android:id="@+id/movie_detail_divider"
             android:layout_width="fill_parent"
             android:layout_height="1dp"
             android:layout_marginTop="2dp"
@@ -106,13 +129,41 @@
             android:background="@android:color/darker_gray"/>
 
         <TextView
+            android:id="@+id/movie_detail_trailers_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginLeft="16dp"
-            android:text="Trailers"
+            android:text="Trailers:"
             android:textAppearance="?android:textAppearanceLarge"
             android:textColor="@color/material_blue_grey_800"/>
+
+        <LinearLayout
+            android:id="@+id/movie_detail_trailers_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/movie_detail_reviews_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="16dp"
+            android:text="Reviews:"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:textColor="@color/material_blue_grey_800"/>
+
+        <LinearLayout
+            android:id="@+id/movie_detail_reviews_container"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </ScrollView>

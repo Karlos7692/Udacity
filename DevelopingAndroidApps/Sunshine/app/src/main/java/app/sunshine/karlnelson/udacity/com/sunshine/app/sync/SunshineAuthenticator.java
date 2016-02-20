@@ -50,11 +50,8 @@ public class SunshineAuthenticator extends AbstractAccountAuthenticator {
 
     // Getting an authentication token is not supported
     @Override
-    public Bundle getAuthToken(
-            AccountAuthenticatorResponse r,
-            Account account,
-            String s,
-            Bundle bundle) throws NetworkErrorException {
+    public Bundle getAuthToken(AccountAuthenticatorResponse r, Account account, String s,
+                               Bundle bundle) throws NetworkErrorException {
         throw new UnsupportedOperationException();
     }
 

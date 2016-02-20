@@ -1,20 +1,26 @@
 package com.nelson.karl.popularmovies.data.model.provider;
 
-import android.content.ContentProvider;
 import android.content.ContentResolver;
+import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 
 import com.nelson.karl.popularmovies.data.model.Movie;
-import com.nelson.karl.popularmovies.data.model.ObjectModelList;
+import com.nelson.karl.popularmovies.data.model.orm.ObjectModelList;
 import com.nelson.karl.popularmovies.data.model.Review;
 import com.nelson.karl.popularmovies.data.model.Trailer;
+import com.nelson.karl.popularmovies.data.model.orm.QueryModel;
+import com.nelson.karl.popularmovies.data.model.utils.PollingCheck;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Karl on 4/01/2016.
@@ -156,13 +162,8 @@ public class TestProvider extends AndroidTestCase {
         Movie m2 = Movie.get(movieRetriever, cm2);
         cm2.close();
 
-        assertEquals(mMovies.get(0).getTrailers(), m1.getTrailers());
-        assertEquals(mMovies.get(0).getReviews(), m1.getReviews());
-        assertEquals(mMovies.get(0), m1);
-
-        assertEquals(mMovies.get(1).getTrailers(), m2.getTrailers());
-        assertEquals(mMovies.get(1).getReviews(), m2.getReviews());
-        assertEquals(mMovies.get(1), m2);
+        assertMovieExactlyEquals(mMovies.get(0), m1);
+        assertMovieExactlyEquals(mMovies.get(1), m2);
 
     }
 
@@ -172,7 +173,7 @@ public class TestProvider extends AndroidTestCase {
         trailer.setWatchUri(Uri.parse("content://something_that_has_changed"));
         trailer.update(mContext);
 
-        Cursor c = mContext.getContentResolver().query(trailer.getInsertUri(), null, null, null, null);
+        Cursor c = mContext.getContentResolver().query(trailer.getUri(), null, null, null, null);
         Trailer result = Trailer.get(new Trailer.Retriever(), c);
         c.close();
 
@@ -190,7 +191,7 @@ public class TestProvider extends AndroidTestCase {
         review.setAuthor("Mark Twain");
         review.update(mContext);
 
-        Cursor c = mContext.getContentResolver().query(review.getInsertUri(), null, null, null, null);
+        Cursor c = mContext.getContentResolver().query(review.getUri(), null, null, null, null);
         Review result = Review.get(new Review.Retriever(), c);
         c.close();
 
@@ -215,77 +216,12 @@ public class TestProvider extends AndroidTestCase {
         }
 
         m2.update(getContext());
-        Cursor c = mContext.getContentResolver().query(m2.getInsertUri(), null, null, null, null);
+        Cursor c = mContext.getContentResolver().query(m2.getUri(), null, null, null, null);
         Movie result = Movie.get(new Movie.Retriever(), c);
         c.close();
 
-        //Assert all uris the same
-        assertEquals(mTrailers.size(), result.getTrailers().size());
-        for ( int i=0; i<mTrailers.size(); i++) {
-            final Trailer expected = mTrailers.get(i);
-            final Trailer resultTrailer = result.getTrailers().get(i);
-            assertEquals(expected, resultTrailer);
-            assertEquals(expected.getWatchUri(), resultTrailer.getWatchUri());
-        }
-
-        assertEquals(mReviews.size(), result.getReviews().size());
-        for ( int i=0; i<mReviews.size(); i++) {
-            final Review expected = mReviews.get(i);
-            final Review resultReview = result.getReviews().get(i);
-            assertEquals(expected, resultReview);
-            assertEquals(expected.getAuthor(), resultReview.getAuthor());
-        }
-
         //Check other movie fields that changed.
-        assertEquals(expectedFavourite, result.isFavourite());
-        assertEquals(m2, result);
-
-    }
-
-    public void testAddTrailerRefreshMovie() {
-        for( Movie movie : mMovies ) {
-            movie.insert(mContext);
-        }
-
-        Trailer t4 = new Trailer();
-        t4.setId("t4");
-        t4.setWatchUri(Uri.parse("content://t4_uri"));
-        t4.setMovie(2);
-        mTrailers.add(t4);
-
-        Movie m2 = mMovies.get(1);
-        assertEquals(4, m2.getTrailers().size());
-
-        //Update m2
-        m2.update(mContext);
-
-        //Test movie db matches objects.
-        ContentResolver cr = mContext.getContentResolver();
-        Uri uri1 = MovieContract.MovieEntry.buildMovieUri(mMovies.get(0).getId());
-        Cursor cm1 = cr.query(uri1, null, null, null, null);
-        Movie movieResult1 = Movie.get(new Movie.Retriever(), cm1);
-        cm1.close();
-
-        Uri uri2 = MovieContract.MovieEntry.buildMovieUri(mMovies.get(1).getId());
-        Cursor cm2 = cr.query(uri2, null, null, null, null);
-        Movie movieResult2 = Movie.get(new Movie.Retriever(), cm2);
-        cm2.close();
-
-        assertEquals(mMovies.get(0).getTrailers(), movieResult1.getTrailers());
-        assertEquals(mMovies.get(0).getReviews(), movieResult1.getReviews());
-        assertEquals(mMovies.get(0), movieResult1);
-
-        assertEquals(mMovies.get(1).getTrailers(), movieResult2.getTrailers());
-        assertEquals(mMovies.get(1).getReviews(), movieResult2.getReviews());
-        assertEquals(mMovies.get(1), movieResult2);
-
-    }
-
-    public void testAddReviewRefreshMovie() {
-
-    }
-
-    public void deleteTrailerRefreshMovie() {
+        assertMovieExactlyEquals(m2, result);
 
     }
 
@@ -294,6 +230,140 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testDeleteRecords() {
+
+    }
+
+
+
+    public void testMergeEditedTrailers() {
+        // Test merge; edited trailers, same length, same order.
+        Trailer t1 = new Trailer();
+        t1.setId("t1");
+        t1.setWatchUri("content://merge-uri1");
+        t1.setMovie(2);
+
+        Trailer t2 = new Trailer();
+        t2.setId("t2");
+        t2.setWatchUri("content://merge-uri2");
+        t2.setMovie(2);
+
+        Trailer t3 = new Trailer();
+        t3.setId("t3");
+        t3.setWatchUri("content://merge-uri3");
+        t3.setMovie(2);
+
+        ObjectModelList<Trailer> externalTrailers = new ObjectModelList<>(mTrailers.getUri());
+        externalTrailers.add(t1);
+        externalTrailers.add(t2);
+        externalTrailers.add(t3);
+
+        // Insert original trailers.
+        mTrailers.insert(getContext());
+
+        QueryModel<Trailer> queryModel = new QueryModel<>( new Trailer.Retriever() );
+
+        ObjectModelList<Trailer> runResult = queryModel.find(getContext(), mTrailers.getUri())
+                .getObjects();
+
+
+        assertTrailersExactlyEqual(mTrailers, runResult);
+
+        // Merge trailers
+        runResult.merge(getContext(), externalTrailers);
+
+        queryModel = new QueryModel<>( new Trailer.Retriever() );
+        ObjectModelList<Trailer> mergedResult = queryModel.find(getContext(), mTrailers.getUri())
+                .getObjects();
+
+        // Assert no change among db result and run result. (Order will always be preserved in this case).
+        assertTrailersExactlyEqual(externalTrailers, mergedResult);
+        assertTrailersExactlyEqual(mergedResult, runResult);
+
+        // Test merge; added one trailer, order not preserved.
+        Trailer t4 = new Trailer();
+        t4.setId("t4");
+        t4.setWatchUri("content://merge-uri4");
+        t4.setMovie(2);
+        externalTrailers.add(1, t4);
+
+        runResult.merge(getContext(), externalTrailers);
+
+        // Order of trailers should be preserved in current query not db query, merge should reorder
+        // trailers to match external ordering (in externalTrailers).
+        assertTrailersExactlyEqual(externalTrailers, runResult);
+
+        //Check to see all items are in the database
+        Set<Trailer> resultSet = new HashSet<>( queryModel.requery(mContext).getObjects() );
+        assertEquals(new HashSet<>(externalTrailers), resultSet);
+
+
+        // Test merge; removed one trailer.
+        externalTrailers.remove(t4);
+
+        runResult.merge(getContext(), externalTrailers);
+
+        assertTrailersExactlyEqual(externalTrailers, runResult);
+
+        //Check to see all items are in the database
+        resultSet = new HashSet<>( queryModel.requery(mContext).getObjects() );
+        assertEquals(new HashSet<>(externalTrailers), resultSet);
+
+        // Test merge; added one trailer, removed one original trailer, order not preserved.
+
+        externalTrailers.remove(t1);
+        externalTrailers.add(0, t4);
+        runResult.merge(getContext(), externalTrailers);
+
+        assertTrailersExactlyEqual(externalTrailers, runResult);
+
+        //Check to see all items are in the database
+        resultSet = new HashSet<>( queryModel.requery(mContext).getObjects() );
+        assertEquals(new HashSet<>(externalTrailers), resultSet);
+
+        // Test completely new set of trailers.
+        Trailer t999 = new Trailer();
+        t999.setId("t999");
+        t999.setWatchUri("content://something-completely-different");
+        t999.setMovie(2);
+
+        externalTrailers.clear();
+        externalTrailers.add(t999);
+
+        runResult.merge(getContext(), externalTrailers);
+
+        assertTrailersExactlyEqual(externalTrailers, runResult);
+        ObjectModelList<Trailer> modelList = queryModel.requery(getContext()).getObjects();
+        assertEquals(new HashSet<>(externalTrailers), new HashSet<>(modelList));
+    }
+
+    public void testMergeReviews() {
+
+        // Test Remove r2 on merge.
+        Review r1 = new Review();
+        r1.setId("r1");
+        r1.setAuthor("Carl Sagan");
+        r1.setContent("Really inspiring piece!");
+        r1.setMovieRef(2);
+
+        ObjectModelList<Review> externalReviews = new ObjectModelList<>(mReviews.getUri());
+        externalReviews.add(r1);
+
+        // Insert original reviews into the database.
+        mReviews.insert(mContext);
+
+        QueryModel<Review> queryModel = new QueryModel<>(new Review.Retriever());
+        ObjectModelList<Review> runReviews = queryModel.find(mContext, mReviews.getUri())
+                .getObjects();
+
+        // Check insert is correct.
+        assertReviewsExactlyEqual(mReviews, runReviews);
+
+        runReviews.merge(mContext, externalReviews);
+
+        assertReviewsExactlyEqual(externalReviews, runReviews);
+
+        ObjectModelList<Review> reviewsInDB = queryModel.requery(mContext).getObjects();
+        assertReviewsExactlyEqual(externalReviews, reviewsInDB);
 
     }
 
@@ -349,7 +419,8 @@ public class TestProvider extends AndroidTestCase {
         m1.setReviews(new ObjectModelList<Review>(MovieContract.ReviewEntry.buildReviewsByMovieUri(1)));
         m1.setPopularity(5.0);
         m1.setVoteAvg(4.0);
-
+        m1.setSynopsis("Something about the movie is amazing.");
+        m1.setDuration(50);
 
         Movie m2 = new Movie();
         m2.setId(2);
@@ -362,6 +433,8 @@ public class TestProvider extends AndroidTestCase {
         m2.setReviews(mReviews);
         m2.setPopularity(6.0);
         m2.setVoteAvg(7.0);
+        m2.setSynopsis("Greatest thing i have ever known.");
+        m2.setDuration(120);
 
         mMovies.add(m1);
         mMovies.add(m2);
@@ -378,4 +451,53 @@ public class TestProvider extends AndroidTestCase {
         db.close();
     }
 
+    private void assertTrailerExactlyEqual(Trailer expected, Trailer result) {
+        assertEquals(expected.getId(), result.getId());
+        assertEquals(expected.getWatchUri(), result.getWatchUri());
+        assertEquals(expected.getMovie(), result.getMovie());
+    }
+
+    private void assertTrailersExactlyEqual(ObjectModelList<Trailer> expected, ObjectModelList<Trailer> result) {
+        assertEquals(expected.size(), result.size());
+        for (int i=0; i<expected.size(); i++) {
+            assertTrailerExactlyEqual(expected.get(i), result.get(i));
+        }
+    }
+
+    private void assertReviewExactlyEqual(Review expected, Review result) {
+        assertEquals(expected.getId(), result.getId());
+        assertEquals(expected.getAuthor(), result.getAuthor());
+        assertEquals(expected.getContent(), result.getContent());
+        assertEquals(expected.getMovieRef(), result.getMovieRef());
+    }
+
+    private void assertReviewsExactlyEqual(ObjectModelList<Review> expected, ObjectModelList<Review> results ) {
+        assertEquals(expected.size(), results.size());
+        for (int i=0; i<expected.size(); i++) {
+            assertReviewExactlyEqual(expected.get(i), results.get(i));
+        }
+    }
+
+    private void assertMovieExactlyEquals(Movie expected, Movie result) {
+        assertEquals(expected.getId(), result.getId());
+        assertEquals(expected.getPopularity(), result.getPopularity());
+        assertEquals(expected.getDuration(), result.getDuration());
+        assertEquals(expected.getPosterPath(), result.getPosterPath());
+        assertEquals(expected.getTitle(), result.getTitle());
+        assertEquals(expected.getVoteAvg(), result.getVoteAvg());
+        assertEquals(expected.getUserRating(), result.getUserRating());
+        assertEquals(expected.getSynopsis(), result.getSynopsis());
+        assertTrailersExactlyEqual((ObjectModelList<Trailer>) expected.getTrailers(),
+                (ObjectModelList<Trailer>) result.getTrailers());
+        assertReviewsExactlyEqual((ObjectModelList<Review>) expected.getReviews(),
+                (ObjectModelList<Review>) result.getReviews());
+        assertEquals(expected.isFavourite(), result.isFavourite());
+    }
+
+    private void assertMoviesExactlyEqual(List<Movie> expected, List<Movie> results) {
+        assertEquals(expected.size(), results.size());
+        for ( int i=0; i<expected.size(); i++) {
+            assertMovieExactlyEquals(expected.get(i), results.get(i));
+        }
+    }
 }

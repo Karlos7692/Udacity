@@ -1,12 +1,14 @@
 package com.nelson.karl.popularmovies;
 
 import android.content.Intent;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.nelson.karl.popularmovies.data.model.Movie;
+import com.nelson.karl.popularmovies.data.model.provider.MovieContract;
 
 public class MainDiscoveryActivity extends AppCompatActivity implements
         MovieDetailFragment.MovieChangedCallback {
@@ -20,19 +22,17 @@ public class MainDiscoveryActivity extends AppCompatActivity implements
 
         if ( findViewById(R.id.movie_detail_fragment_container) != null ) {
             mTwoPane = true;
-
-            MovieDetailFragment mdf = new MovieDetailFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_fragment_container, mdf, mdf.TAG)
-                    .commit();
+            if ( savedInstanceState == null ) {
+                MovieDetailFragment mdf = new MovieDetailFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_fragment_container, mdf, mdf.TAG)
+                        .commit();
+            }
         } else {
             mTwoPane = false;
         }
-
         MainDiscoveryFragment mainDiscFrag = (MainDiscoveryFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.main_discovery_fragment);
-        mainDiscFrag.setIsTwoPane(mTwoPane);
-
     }
 
 
@@ -60,9 +60,30 @@ public class MainDiscoveryActivity extends AppCompatActivity implements
 
     @Override
     public void onMovieSelected(Movie movie) {
-        MovieDetailFragment mdf = (MovieDetailFragment) getSupportFragmentManager()
-                .findFragmentByTag(MovieDetailFragment.TAG);
+        if ( mTwoPane ) {
 
-        mdf.onMovieChanged(movie);
+            final FragmentManager manager = getSupportFragmentManager();
+            final MovieDetailFragment currentMDF = (MovieDetailFragment) manager.
+                    findFragmentByTag(MainDiscoveryFragment.TAG);
+
+            if ( currentMDF != null && currentMDF.movieLoaded() ) {
+                currentMDF.onMovieChanged(movie);
+            } else {
+                // Create a new fragment with a new loader.
+                final Bundle args = new Bundle();
+                args.putParcelable(MovieDetailFragment.MOVIE_DETAILS, movie.getUri());
+                MovieDetailFragment newMDF = new MovieDetailFragment();
+                newMDF.setArguments(args);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_fragment_container, newMDF, newMDF.TAG)
+                        .commit();
+            }
+        } else {
+            Intent intent = new Intent(this, MovieDetailActivity.class);
+            intent.setData(movie.getUri());
+            startActivity(intent);
+        }
+
+
     }
 }

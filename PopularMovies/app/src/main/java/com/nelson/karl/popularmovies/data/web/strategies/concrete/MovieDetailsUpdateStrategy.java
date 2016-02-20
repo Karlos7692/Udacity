@@ -45,7 +45,6 @@ public class MovieDetailsUpdateStrategy extends DownloadStrategy<Movie, Movie> {
 
         final QueryModel<Movie> queryModel = new QueryModel<>(new Movie.Retriever())
                 .find(context, downloadedMovie.getUri());
-
         if ( queryModel.exists() ) {
             queryModel.get().merge(context, downloadedMovie);
         } else {

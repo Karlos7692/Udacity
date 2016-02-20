@@ -17,8 +17,6 @@ import java.net.URL;
 
 public abstract class DownloadStrategy<Params, Result> {
 
-    public final String LOG_TAG = "Download Strategy: ";
-
     private Context mContext;
     private JsonParser<Result> mParser;
 
@@ -27,7 +25,8 @@ public abstract class DownloadStrategy<Params, Result> {
         mParser = parser;
     }
 
-    public Result apply(Params... params) {
+    @SafeVarargs
+    public final Result apply( Params... params ) {
 
         //Parse the list of movies from JSON;
         Result result = null;
@@ -45,7 +44,7 @@ public abstract class DownloadStrategy<Params, Result> {
             Uri uri = getDownloadUri(params);
             URL url = new URL(uri.toString());
 
-            Log.d(LOG_TAG, uri.toString());
+            Log.d(getLogTag(), uri.toString());
 
             // Create the request to OpenWeatherMap, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -71,21 +70,21 @@ public abstract class DownloadStrategy<Params, Result> {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                Log.d(LOG_TAG, "buffer: " + "is null!!!!!");
+                Log.d(getLogTag(), "buffer: " + "is null!!!!!");
                 return null;
             }
-            Log.d(LOG_TAG, "buffer: " + buffer.toString());
+            Log.d(getLogTag(), "buffer: " + buffer.toString());
             try {
                 // Parse result
                 result = mParser.parse(buffer.toString());
                 doAdditionalStrategies(result);
                 return result;
             } catch (JSONException e) {
-                Log.d(LOG_TAG, "Could not parse Json.");
+                Log.d(getLogTag(), "Could not parse Json.");
             }
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error ", e.getCause());
+            Log.e(getLogTag(), "Error ", e.getCause());
             return null;
         } finally {
             if (urlConnection != null) {
@@ -95,7 +94,7 @@ public abstract class DownloadStrategy<Params, Result> {
                 try {
                     reader.close();
                 } catch (final IOException e) {
-                    Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.e(getLogTag(), "Error closing stream", e);
                 }
             }
         }
@@ -104,11 +103,21 @@ public abstract class DownloadStrategy<Params, Result> {
         return null;
     }
 
+    /**
+     * Kick off any additional tasks to be done before returning entire object back to user.
+     * @param result the result type fully updated.
+     */
     public void doAdditionalStrategies(Result result) {
         // Do nothing, let children override these functions if need be!
     }
 
-    public void insertResultIntoDB (Result result ) {
+    /**
+     * Launch any sub tasks required but not needed at the moment.
+     * @param result
+     */
+
+
+    public void updateDB(Result result) {
         // Do nothing, let children override these functions if need be!
     }
 
@@ -117,4 +126,6 @@ public abstract class DownloadStrategy<Params, Result> {
     public Context getContext() {
         return mContext;
     }
+
+    public abstract String getLogTag();
 }

@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +15,11 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import com.nelson.karl.popularmovies.data.model.Movie;
-import com.nelson.karl.popularmovies.data.utils.MovieDownloadTask;
+import com.nelson.karl.popularmovies.data.model.provider.MovieContract;
+import com.nelson.karl.popularmovies.data.web.tasks.concrete.DiscoverMoviesDownloadTask;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,37 +27,33 @@ import java.util.List;
  */
 public class MainDiscoveryFragment extends Fragment {
 
+    private static final int MAIN_DISCOVERY_LOADER_ID = 0;
+
     public static final String TAG = "Main Discovery Fragment";
     private static final String MOVIE_DATA = "Movie Data";
 
     private static final String LOG_TAG = TAG;
-    private static final CharSequence NO_NETWORK_CONNECTION_MESSAGE = "You don't have an active network"
-            + " connection. Please connect to the internet.";
+    private static final CharSequence NO_NETWORK_CONNECTION_MESSAGE =
+            "You don't have an active network connection. Please connect to the internet.";
 
     private MovieAdapter mDataAdapter;
-    private boolean mTwoPane;
 
     public MainDiscoveryFragment() {
-    }
-
-    public void setIsTwoPane( boolean largeDevice ) {
-        mTwoPane = largeDevice;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if ( savedInstanceState == null ) {
-            mDataAdapter = new MovieAdapter(
-                    getActivity(),
-                    R.layout.view_movie_thumb,
-                    new ArrayList<Movie>()
-            );
-            updateMovies();
-        } else {
-            restoreMovieDate( savedInstanceState );
+        if ( savedInstanceState != null ) {
+            restoreMovieData(savedInstanceState);
+            return;
         }
+
+        // No instance state saved, Get Movies
+        mDataAdapter = new MovieAdapter( getActivity(), R.layout.view_movie_thumb,
+                    new ArrayList<Movie>() );
+        updateMovies();
     }
 
     @Override
@@ -74,14 +71,8 @@ public class MainDiscoveryFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Movie movie = (Movie) parent.getItemAtPosition(position);
-                if ( mTwoPane ) {
-                    MainDiscoveryActivity mdf = (MainDiscoveryActivity) getActivity();
-                    mdf.onMovieSelected(movie);
-                } else {
-                    Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                    intent.putExtra(MovieDetailFragment.MOVIE_DETAILS, movie);
-                    startActivity(intent);
-                }
+                MainDiscoveryActivity mdf = (MainDiscoveryActivity) getActivity();
+                mdf.onMovieSelected(movie);
             }
         });
 
@@ -91,26 +82,24 @@ public class MainDiscoveryFragment extends Fragment {
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        if ( savedInstanceState==null ) {
-            updateMovies();
-        } else {
-            restoreMovieDate(savedInstanceState);
+        if ( savedInstanceState != null ) {
+            restoreMovieData(savedInstanceState);
         }
+
     }
 
     @Override
     public void onResume() {
         super.onResume();
         if ( !isNetworkAvailable() ) {
-            Log.d(LOG_TAG, "Should be here");
             Toast.makeText(getActivity(), NO_NETWORK_CONNECTION_MESSAGE, Toast.LENGTH_LONG).show();
         }
     }
 
     private void updateMovies() {
         if ( isNetworkAvailable() ) {
-            MovieDownloadTask downloadTask = new MovieDownloadTask(getActivity(), mDataAdapter);
-            downloadTask.execute();
+            DiscoverMoviesDownloadTask movieDownloadTask = new DiscoverMoviesDownloadTask(getActivity(), mDataAdapter);
+            movieDownloadTask.execute();
         }
     }
 
@@ -125,14 +114,15 @@ public class MainDiscoveryFragment extends Fragment {
 
     }
 
-    private void restoreMovieDate( Bundle inBundle ) {
-        List<Movie> savedMovies =
-                Arrays.asList( ( Movie[]) inBundle.getParcelableArray(MOVIE_DATA));
-        mDataAdapter = new MovieAdapter(
-                getActivity(),
-                R.layout.view_movie_thumb,
-                savedMovies
-        );
+    private void restoreMovieData(Bundle inBundle) {
+        Parcelable[] movieData = inBundle.getParcelableArray(MOVIE_DATA);
+        if ( movieData != null ) {
+            List<Movie> savedMovies = new ArrayList<>();
+            for ( Parcelable data : movieData ) {
+                savedMovies.add((Movie) data );
+            }
+            mDataAdapter = new MovieAdapter(getActivity(), R.layout.view_movie_thumb, savedMovies );
+        }
     }
 
     private boolean isNetworkAvailable() {
