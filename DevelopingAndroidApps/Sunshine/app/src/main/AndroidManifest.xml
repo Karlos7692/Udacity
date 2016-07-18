@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.sunshine.karlnelson.udacity.com.sunshine.app" >
+    package="sunshine.karlnelson.app" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Permissions required by the sync adapter -->
     <uses-permission
@@ -19,7 +20,7 @@
         android:icon="@mipmap/ic_launcher">
 
         <activity
-            android:name=".MainActivity"
+            android:name="sunshine.karlnelson.app.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/ForecastTheme"
             android:icon="@mipmap/ic_launcher">
@@ -30,35 +31,34 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name="sunshine.karlnelson.app.DetailActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName="sunshine.karlnelson.app.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.sunshine.karlnelson.udacity.com.sunshine.app.MainActivity" />
+                android:value="sunshine.karlnelson.app.MainActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name="sunshine.karlnelson.app.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/SettingsTheme"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="sunshine.karlnelson.app.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="app.sunshine.karlnelson.udacity.com.sunshine.app.MainActivity"/>
+                android:value="sunshine.karlnelson.app.MainActivity"/>
         </activity>
 
         <provider
             android:authorities="@string/content_authority"
-            android:name=".data.WeatherProvider"
+            android:name="sunshine.karlnelson.app.data.WeatherProvider"
             android:exported="false"
             android:syncable="true" />
 
-        <service android:name=".service.SunshineService"/>
+        <service android:name="sunshine.karlnelson.app.service.SunshineService"/>
 
         <!-- SyncAdapter's dummy authentication service -->
         <service
-            android:name=".sync.SunshineAuthenticatorService"
-            >
+            android:name="sunshine.karlnelson.app.sync.SunshineAuthenticatorService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -69,7 +69,7 @@
 
         <!-- The SyncAdapter service -->
         <service
-            android:name=".sync.SunshineSyncService"
+            android:name="sunshine.karlnelson.app.sync.SunshineSyncService"
             android:exported="true"
             >
             <intent-filter>

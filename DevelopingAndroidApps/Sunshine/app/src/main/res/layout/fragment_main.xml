@@ -8,5 +8,14 @@
         android:id="@+id/listview_forecast"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null" />
+        android:divider="@null" >
+
+        </ListView>
+        <TextView
+            android:id="@+id/no_weather_information"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_forecast_list_default"
+            android:gravity="center_horizontal"
+            android:padding="16dp" />
 </FrameLayout>

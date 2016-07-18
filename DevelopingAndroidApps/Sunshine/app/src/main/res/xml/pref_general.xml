@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <EditTextPreference
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/sunshine.karlnelson.app">
+
+    <sunshine.karlnelson.app.views.LocationEditTextPreference
         android:title="@string/pref_location_title"
         android:key="@string/pref_location_key"
         android:defaultValue="@string/pref_location_default_value"
         android:inputType="text"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        custom:minLength="3"/>
 
     <ListPreference
         android:title="@string/pref_temperature_units_title"
