@@ -1,13 +1,25 @@
 <resources>
-  <string name="app_name">Stock Hawk</string>
+    <string translatable="true" name="app_name">Stock Hawk</string>
 
-  <string name="action_example">Example action</string>
+    <string translatable="true" name="action_example">Example action</string>
 
-  <string name="action_settings">Settings</string>
-  <string name="action_change_units">Change Units</string>
-  <string name="symbol_search">Symbol Search</string>
-  <string name="content_test">Search for a Stock Symbol</string>
-  <string name="input_hint">FB</string>
-  <string name="input_prefill"></string>
-  <string name="network_toast">Uh-oh! This app requires an internet connection</string>
+    <string translatable="true" name="action_settings">Settings</string>
+    <string translatable="true" name="action_change_units">Change Units</string>
+    <string translatable="true" name="symbol_search">Symbol Search</string>
+    <string translatable="true" name="content_test">Search for a Stock Symbol</string>
+    <string translatable="true" name="input_hint">FB</string>
+    <string translatable="true" name="input_prefill"></string>
+    <string translatable="true" name="network_toast">Uh-oh! This app requires an internet connection</string>
+    <string translatable="true" name="no_internet_connection_text">No Internet Connection</string>
+    <string translatable="true" name="add_stock_description">Add Stock</string>
+    <string translatable="true" name="loading_description">Loading</string>
+    <string translatable="true" name="line_chart_description">Line chart of prices</string>
+    <string translatable="true" name="no_stock_information_available">No Stock Information Available</string>
+
+
+    <string translatable="false" name="tag_key">tag</string>
+    <string translatable="false" name="add_param">add</string>
+    <string translatable="false" name="symbol_key">symbol</string>
+    <string translatable="false" name="invalid_stock_symbol_key">invalid_stock_symbol</string>
+
 </resources>

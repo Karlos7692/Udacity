@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.sam_chordas.android.stockhawk.R;
 import com.sam_chordas.android.stockhawk.data.QuoteColumns;
 import com.sam_chordas.android.stockhawk.data.QuoteProvider;
+import com.sam_chordas.android.stockhawk.rest.model.soap.quote.Quote;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperAdapter;
 import com.sam_chordas.android.stockhawk.touch_helper.ItemTouchHelperViewHolder;
 
@@ -45,8 +46,16 @@ public class QuoteCursorAdapter extends CursorRecyclerViewAdapter<QuoteCursorAda
 
   @Override
   public void onBindViewHolder(final ViewHolder viewHolder, final Cursor cursor){
-    viewHolder.symbol.setText(cursor.getString(cursor.getColumnIndex("symbol")));
-    viewHolder.bidPrice.setText(cursor.getString(cursor.getColumnIndex("bid_price")));
+    String symbol = cursor.getString(cursor.getColumnIndex(QuoteColumns.SYMBOL));
+    String bid = cursor.getString(cursor.getColumnIndex(QuoteColumns.BIDPRICE));
+//    String name = cursor.getString(cursor.getColumnIndex(QuoteColumns.COMPANY_NAME));
+//    String exchange = cursor.getString(cursor.getColumnIndex(QuoteColumns.STOCK_EXCHANGE));
+    String change = cursor.getString(cursor.getColumnIndex(QuoteColumns.CHANGE));
+    //Quote quote = new Quote(symbol, name, Float.valueOf(bid), change, percentChange, exchange);
+    viewHolder.symbol.setText(symbol);
+    //viewHolder.symbol.setTag(quote);
+    viewHolder.change.setText(change);
+    viewHolder.bidPrice.setText(bid);
     int sdk = Build.VERSION.SDK_INT;
     if (cursor.getInt(cursor.getColumnIndex("is_up")) == 1){
       if (sdk < Build.VERSION_CODES.JELLY_BEAN){

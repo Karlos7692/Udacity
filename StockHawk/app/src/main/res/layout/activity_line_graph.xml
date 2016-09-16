@@ -4,9 +4,28 @@
     android:layout_height="match_parent">
 
     <com.db.chart.view.LineChartView
+        android:contentDescription="@string/line_chart_description"
         xmlns:chart="http://schemas.android.com/apk/res-auto"
         android:id="@+id/linechart"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="300dp"
+        android:padding="4dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        chart:paddingStart="16dp"
+        chart:paddingEnd="16dp"
+        android:background="@color/material_blue_500" />
+
+    <ProgressBar
+        android:contentDescription="@string/loading_description"
+        android:id="@+id/loadingchart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"/>
 
 </FrameLayout>
